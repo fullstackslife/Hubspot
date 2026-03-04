@@ -12,6 +12,9 @@ if (!envValidation.ok) {
   }
   process.exit(1);
 }
+for (const warning of envValidation.warnings) {
+  console.warn(`[env] ${warning}`);
+}
 
 const port = Number(process.env.PORT || 8787);
 
