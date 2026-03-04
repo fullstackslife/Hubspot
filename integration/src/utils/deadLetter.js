@@ -1,7 +1,7 @@
 import { mkdir, appendFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
-const DEAD_LETTER_PATH = resolve(process.cwd(), process.env.DEAD_LETTER_FILE || 'integration/dead-letter/failed-leads.ndjson');
+const DEAD_LETTER_PATH = resolve(process.cwd(), process.env.DEAD_LETTER_FILE || 'dead-letter/failed-leads.ndjson');
 
 /**
  * @param {{payload: Record<string, unknown>, error: string, stage: string}} entry

@@ -2,5 +2,7 @@
 integration/node_modules/
 .env
 integration/.env
+integration/dead-letter/
+dead-letter/
 .DS_Store
 Thumbs.db

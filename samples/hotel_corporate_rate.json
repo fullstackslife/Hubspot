@@ -1,0 +1,15 @@
+﻿{
+  "email": "travel@northline.com",
+  "firstname": "Mark",
+  "lastname": "Ellis",
+  "phone": "727-555-0112",
+  "company": "Northline Logistics",
+  "website_domain": "hotelsales.online",
+  "lead_source": "form",
+  "lead_type": "hotel_corporate_rate",
+  "industry": "Logistics",
+  "location": "Tampa, FL",
+  "budget": 4200,
+  "timeline": "Monthly",
+  "source_campaign": "corporate_rate_april"
+}

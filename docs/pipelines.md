@@ -1,5 +1,13 @@
 ﻿# Pipeline Definitions
 
+## Environment mapping
+| Pipeline | Env key |
+|---|---|
+| Hotel Leads | `PIPELINE_HOTEL` |
+| Creator Partnerships | `PIPELINE_CREATOR` |
+| AI Clients | `PIPELINE_AI` |
+| Warbot Users | `PIPELINE_WARBOT` |
+
 ## Hotel Leads
 `Lead Captured` -> `Contacted` -> `Interested` -> `Proposal Sent` -> `Rooms Blocked` -> `Closed Won` / `Closed Lost`
 
@@ -13,6 +21,6 @@
 `Lead Captured` -> `Eligibility Reviewed` -> `Access Provisioned` -> `Active` -> `Converted` / `Churned`
 
 ## Stage governance
-- Auto-created deals start at `Lead Captured`.
+- Auto-created deals start at `STAGE_DEFAULT_LEAD_CAPTURED`.
 - Stage movement after `Lead Captured` is manual by sales/ops.
 - Closed stages require reason notes in deal description.

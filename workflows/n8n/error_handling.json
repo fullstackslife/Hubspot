@@ -15,7 +15,7 @@
     },
     {
       "parameters": {
-        "functionCode": "const status = Number($json.status || 0);\nconst retryable = [429, 500, 502, 503, 504].includes(status);\nreturn [{ json: { ...$json, retryable } }];"
+        "functionCode": "const status = Number($json.status || 0);\nconst retryable = [429,500,502,503,504].includes(status);\nconst attempt = Number($json.attempt || 0);\nconst maxAttempts = Number($env.HUBSPOT_MAX_RETRIES || 3);\nconst shouldRetry = retryable && attempt < maxAttempts;\nreturn [{ json: { ...$json, retryable, shouldRetry, attempt: attempt + 1, maxAttempts } }];"
       },
       "id": "Classify",
       "name": "Classify Error",
@@ -28,39 +28,39 @@
         "conditions": {
           "boolean": [
             {
-              "value1": "={{$json.retryable}}",
+              "value1": "={{$json.shouldRetry}}",
               "operation": "true"
             }
           ]
         }
       },
       "id": "If",
-      "name": "Retryable?",
+      "name": "Retryable and Under Limit?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [700, 260]
+      "position": [740, 260]
     },
     {
       "parameters": {
-        "responseBody": "={{ { action: 'retry', payload: $json } }}",
+        "responseBody": "={{ { action: 'retry', attempt: $json.attempt, maxAttempts: $json.maxAttempts, payload: $json.payload } }}",
         "responseCode": 202
       },
       "id": "Retry",
       "name": "Queue Retry",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [930, 170]
+      "position": [1000, 180]
     },
     {
       "parameters": {
-        "responseBody": "={{ { action: 'dead_letter', payload: $json } }}",
+        "responseBody": "={{ { action: 'dead_letter', record: { timestamp: new Date().toISOString(), stage: 'n8n_error_handler', error: $json.error || 'unknown', payload: $json.payload } } }}",
         "responseCode": 200
       },
       "id": "DLQ",
       "name": "Dead Letter",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [930, 350]
+      "position": [1000, 360]
     }
   ],
   "connections": {
@@ -68,9 +68,9 @@
       "main": [[{ "node": "Classify Error", "type": "main", "index": 0 }]]
     },
     "Classify Error": {
-      "main": [[{ "node": "Retryable?", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Retryable and Under Limit?", "type": "main", "index": 0 }]]
     },
-    "Retryable?": {
+    "Retryable and Under Limit?": {
       "main": [
         [{ "node": "Queue Retry", "type": "main", "index": 0 }],
         [{ "node": "Dead Letter", "type": "main", "index": 0 }]

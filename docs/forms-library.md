@@ -1,5 +1,11 @@
 ﻿# HubSpot Form Library
 
+## Shared required hidden fields (all forms)
+- `website_domain`
+- `lead_source=form`
+- `lead_type`
+- `source_campaign` (default from `utm_campaign`, optional)
+
 ## `group_booking_intake`
 Fields:
 - `event_type`
@@ -11,7 +17,6 @@ Fields:
 
 Hidden defaults:
 - `lead_type=hotel_group_booking`
-- `lead_source=form`
 
 ## `corporate_rate_request`
 Fields:
@@ -23,7 +28,6 @@ Fields:
 
 Hidden defaults:
 - `lead_type=hotel_corporate_rate`
-- `lead_source=form`
 
 ## `warbot_access_request`
 Fields:
@@ -35,7 +39,6 @@ Fields:
 
 Hidden defaults:
 - `lead_type=warbot_access`
-- `lead_source=form`
 
 ## `creator_collaboration_intake`
 Fields:
@@ -47,7 +50,6 @@ Fields:
 
 Hidden defaults:
 - `lead_type=creator_collab`
-- `lead_source=form`
 
 ## `client_project_intake`
 Fields:
@@ -59,11 +61,9 @@ Fields:
 
 Hidden defaults:
 - `lead_type=client_project`
-- `lead_source=form`
 
-## Domain binding
-Set hidden `website_domain` per site embed:
-- `warbot.cloud`
-- `hotelsales.online`
-- `vibechain.ink`
-- `fullstacks.us`
+## Domain embed mapping
+- `forms/embeds/hotelsales.online.html`: hotel forms (`hotel_group_booking` or `hotel_corporate_rate`)
+- `forms/embeds/warbot.cloud.html`: `warbot_access`
+- `forms/embeds/vibechain.ink.html`: `creator_collab`
+- `forms/embeds/fullstacks.us.html`: `client_project`

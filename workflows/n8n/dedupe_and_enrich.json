@@ -6,7 +6,7 @@
         "triggerTimes": {
           "item": [
             {
-              "mode": "everyMinute"
+              "mode": "everyHour"
             }
           ]
         }
@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "functionCode": "// Replace with real source pull (sheet/db/queue).\nreturn [];"
+        "functionCode": "// Replace with queue/db fetch.\n// Return one item per lead payload.\nreturn [];"
       },
       "id": "Load",
       "name": "Load Raw Leads",
@@ -29,13 +29,25 @@
     },
     {
       "parameters": {
-        "functionCode": "// Placeholder enrichment. Add Clearbit or internal enrichment API here.\nreturn items.map(item => {\n  const lead = item.json;\n  const budget = Number(lead.budget || 0);\n  lead.intent_score = lead.intent_score || (budget >= 10000 ? 'high' : budget >= 1000 ? 'medium' : 'low');\n  return { json: lead };\n});"
+        "functionCode": "return items.map((item) => {\n  const lead = item.json;\n  lead.email = lead.email ? String(lead.email).toLowerCase().trim() : null;\n  lead.dedupe_key = lead.email || `${String(lead.phone || '').trim()}::${String(lead.company || '').trim().toLowerCase()}`;\n  const budget = Number(lead.budget || 0);\n  if (!lead.intent_score) {\n    lead.intent_score = budget >= 10000 || lead.company ? 'high' : budget >= 1000 ? 'medium' : 'low';\n  }\n  return { json: lead };\n});"
       },
       "id": "Enrich",
-      "name": "Enrich + Score",
+      "name": "Normalize + Score",
       "type": "n8n-nodes-base.function",
       "typeVersion": 2,
       "position": [700, 260]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.INTEGRATION_BASE_URL}}/ingest/lead",
+        "sendBody": true,
+        "bodyParametersJson": "={{$json}}"
+      },
+      "id": "Push",
+      "name": "Push To Integration",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [930, 260]
     }
   ],
   "connections": {
@@ -43,7 +55,10 @@
       "main": [[{ "node": "Load Raw Leads", "type": "main", "index": 0 }]]
     },
     "Load Raw Leads": {
-      "main": [[{ "node": "Enrich + Score", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Normalize + Score", "type": "main", "index": 0 }]]
+    },
+    "Normalize + Score": {
+      "main": [[{ "node": "Push To Integration", "type": "main", "index": 0 }]]
     }
   }
 }

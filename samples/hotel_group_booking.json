@@ -1,17 +1,15 @@
 ﻿{
-  "email": "events@buildco.com",
-  "firstname": "Alex",
-  "lastname": "Morgan",
-  "phone": "727-555-1212",
-  "company": "BuildCo",
+  "email": "events@acmebuild.com",
+  "firstname": "Alicia",
+  "lastname": "Stone",
+  "phone": "813-555-0101",
+  "company": "Acme Build Co",
   "website_domain": "hotelsales.online",
   "lead_source": "form",
   "lead_type": "hotel_group_booking",
   "industry": "Construction",
   "location": "Clearwater, FL",
-  "budget": 25000,
-  "timeline": "next_month",
-  "intent_score": "high",
-  "source_campaign": "march_construction_blast",
-  "raw_payload_ref": "sample/group_booking/001"
+  "budget": 18000,
+  "timeline": "April 2026",
+  "source_campaign": "q2_group_booking"
 }

@@ -6,6 +6,12 @@ about: Build reusable intake forms across all websites
 ## Objective
 Create reusable intake forms for lead capture across projects.
 
+## Tracking metadata
+- Milestone: `M04` or `M05`
+- Label: exactly one `milestone:mXX`
+- Label: exactly one `type:*`
+- Label: exactly one `priority:*`
+
 ## Deliverables
 - `group_booking_intake`
 - `corporate_rate_request`

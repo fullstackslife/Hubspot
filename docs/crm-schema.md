@@ -1,4 +1,6 @@
-﻿# CRM Schema
+﻿# CRM Schema (Authoritative Contract)
+
+This schema is the single ingestion contract for HubSpot forms, scraper payloads, and n8n workflows.
 
 ## Canonical lead object
 
@@ -24,8 +26,14 @@
 }
 ```
 
-## HubSpot custom properties
+## Hotel-first routing rules
+- `hotel_group_booking` -> `Hotel Leads`
+- `hotel_corporate_rate` -> `Hotel Leads`
+- Auto-create deal if:
+  - `intent_score = high`, or
+  - `budget >= 5000`
 
+## HubSpot custom properties
 Create these custom contact properties:
 - `lead_source` (dropdown): `form`, `chat`, `scraper`, `import`
 - `lead_type` (dropdown): `hotel_group_booking`, `hotel_corporate_rate`, `warbot_access`, `creator_collab`, `client_project`
@@ -47,21 +55,22 @@ Create these custom deal properties:
 
 | Source | Input fields | Required transform |
 |---|---|---|
-| HubSpot forms | native form fields + hidden fields | set `lead_source=form`, set domain + lead type |
-| Live chat | chat transcript identity | map transcript metadata to `source_campaign` |
+| HubSpot forms | native fields + hidden fields | set `lead_source=form`, set domain + lead type |
+| Live chat | identity + transcript metadata | map metadata to `source_campaign` |
 | Scraper | raw lead JSON | normalize names, infer intent, set `website_domain=external_scraper` |
 | Manual import | CSV | enforce required fields and enum validation |
 
-## Deduplication
-
-1. Primary key: normalized lowercase email
-2. Fallback key: `phone + company` normalized
+## Idempotency and dedupe
+1. Primary key: normalized lowercase `email`
+2. Fallback key: normalized `phone + company`
 3. Upsert behavior: update existing contact/deal if matched
 
-## Deal auto-create rule
+## Retry and dead-letter policy
+Retryable HubSpot responses:
+- 429, 500, 502, 503, 504
 
-Create deals when:
-- `intent_score=high`, or
-- `budget >= 5000`
-
-All other leads remain contact-only until manually qualified.
+If retries are exhausted or payload validation fails, write dead-letter NDJSON entry with:
+- `timestamp`
+- `stage` (`validation` or `hubspot_write`)
+- `error`
+- `payload`

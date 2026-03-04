@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "hubspot-lead-engine",
   "version": "0.1.0",
   "private": true,
@@ -9,6 +9,8 @@
   "scripts": {
     "test": "npm --workspace integration test",
     "build": "npm --workspace integration run build",
-    "start": "npm --workspace integration start"
+    "start": "npm --workspace integration start",
+    "github:setup": "powershell -ExecutionPolicy Bypass -File scripts/github/setup-milestones.ps1 -Repo fullstackslife/Hubspot",
+    "github:hygiene": "powershell -ExecutionPolicy Bypass -File scripts/github/hygiene-check.ps1 -Repo fullstackslife/Hubspot"
   }
 }

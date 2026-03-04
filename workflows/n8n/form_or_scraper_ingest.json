@@ -11,76 +11,88 @@
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [260, 260]
+      "position": [260, 300]
     },
     {
       "parameters": {
-        "functionCode": "const body = $json.body || $json;\nconst leadTypeToPipeline = {\n  hotel_group_booking: 'Hotel Leads',\n  hotel_corporate_rate: 'Hotel Leads',\n  creator_collab: 'Creator Partnerships',\n  client_project: 'AI Clients',\n  warbot_access: 'Warbot Users'\n};\n\nbody.email = (body.email || '').toLowerCase().trim();\nbody.pipeline_name = body.pipeline_name || leadTypeToPipeline[body.lead_type];\nbody.intent_score = body.intent_score || ((Number(body.budget || 0) >= 10000 || body.company) ? 'high' : (Number(body.budget || 0) >= 1000 ? 'medium' : 'low'));\nreturn [{ json: body }];"
+        "functionCode": "const body = $json.body || $json;\nconst leadTypeToPipeline = {\n  hotel_group_booking: 'Hotel Leads',\n  hotel_corporate_rate: 'Hotel Leads',\n  creator_collab: 'Creator Partnerships',\n  client_project: 'AI Clients',\n  warbot_access: 'Warbot Users'\n};\n\nconst required = ['email','firstname','lastname','website_domain','lead_source','lead_type'];\nconst missing = required.filter((k) => !body[k]);\nif (missing.length) {\n  return [{ json: { ok: false, status: 400, errors: [`Missing required fields: ${missing.join(', ')}`], payload: body } }];\n}\n\nbody.email = String(body.email).trim().toLowerCase();\nbody.pipeline_name = body.pipeline_name || leadTypeToPipeline[body.lead_type];\nif (!body.intent_score) {\n  const budget = Number(body.budget || 0);\n  body.intent_score = budget >= 10000 || body.company ? 'high' : budget >= 1000 ? 'medium' : 'low';\n}\n\nreturn [{ json: { ok: true, payload: body } }];"
       },
       "id": "Normalize",
-      "name": "Normalize Lead",
+      "name": "Normalize + Validate",
       "type": "n8n-nodes-base.function",
       "typeVersion": 2,
-      "position": [520, 260]
+      "position": [530, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.ok}}",
+              "operation": "true"
+            }
+          ]
+        }
+      },
+      "id": "IfValid",
+      "name": "Payload Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [780, 300]
     },
     {
       "parameters": {
         "url": "={{$env.INTEGRATION_BASE_URL}}/ingest/lead",
         "sendBody": true,
-        "bodyParametersJson": "={{$json}}",
-        "options": {}
+        "bodyParametersJson": "={{$json.payload}}",
+        "options": {
+          "timeout": 30000
+        }
       },
       "id": "Integration",
       "name": "Call Integration API",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [780, 260]
+      "position": [1030, 200]
     },
     {
       "parameters": {
         "responseBody": "={{$json}}",
         "responseCode": 200
       },
-      "id": "Respond",
-      "name": "Respond",
+      "id": "RespondOk",
+      "name": "Respond Success",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1040, 260]
+      "position": [1280, 200]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{$json}}",
+        "responseCode": 400
+      },
+      "id": "RespondBad",
+      "name": "Respond Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1030, 430]
     }
   ],
   "connections": {
     "Webhook Trigger": {
-      "main": [
-        [
-          {
-            "node": "Normalize Lead",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Normalize + Validate", "type": "main", "index": 0 }]]
     },
-    "Normalize Lead": {
+    "Normalize + Validate": {
+      "main": [[{ "node": "Payload Valid?", "type": "main", "index": 0 }]]
+    },
+    "Payload Valid?": {
       "main": [
-        [
-          {
-            "node": "Call Integration API",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Call Integration API", "type": "main", "index": 0 }],
+        [{ "node": "Respond Validation Error", "type": "main", "index": 0 }]
       ]
     },
     "Call Integration API": {
-      "main": [
-        [
-          {
-            "node": "Respond",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]]
     }
   }
 }

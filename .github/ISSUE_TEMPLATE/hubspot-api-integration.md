@@ -6,6 +6,12 @@ about: Implement automated lead ingestion from n8n and scrapers
 ## Objective
 Create service for pushing leads from workflows into HubSpot.
 
+## Tracking metadata
+- Milestone: `M06`, `M07`, or `M08`
+- Label: exactly one `milestone:mXX`
+- Label: exactly one `type:*`
+- Label: exactly one `priority:*`
+
 ## Features
 - `create_or_update_contact`
 - `create_or_update_deal`

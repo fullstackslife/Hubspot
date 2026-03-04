@@ -1,0 +1,9 @@
+﻿{
+  "email": "invalid-email",
+  "firstname": "Broken",
+  "lastname": "Payload",
+  "website_domain": "hotelsales.online",
+  "lead_source": "form",
+  "lead_type": "hotel_group_booking",
+  "budget": "not-a-number"
+}

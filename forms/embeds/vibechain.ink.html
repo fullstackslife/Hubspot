@@ -1,15 +1,29 @@
-﻿<!-- Replace FORM_ID and PORTAL_ID before deploying -->
+﻿<!-- Replace PORTAL_ID / FORM_ID / LEAD_TYPE before deploying -->
 <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
 <script>
-  hbspt.forms.create({
-    region: "na1",
-    portalId: "PORTAL_ID",
-    formId: "FORM_ID",
-    target: "#vibechain-form-root",
-    onFormReady: function () {
-      const domainField = document.querySelector('input[name="website_domain"]');
-      if (domainField) domainField.value = "vibechain.ink";
+  (function () {
+    var LEAD_TYPE = 'creator_collab';
+    var SOURCE_CAMPAIGN = new URLSearchParams(window.location.search).get('utm_campaign') || '';
+
+    function setHidden(formElement, name, value) {
+      var field = formElement.querySelector('input[name="' + name + '"]');
+      if (field) {
+        field.value = value;
+      }
     }
-  });
+
+    hbspt.forms.create({
+      region: 'na1',
+      portalId: 'PORTAL_ID',
+      formId: 'FORM_ID',
+      target: '#vibechain-form-root',
+      onFormReady: function (formElement) {
+        setHidden(formElement, 'website_domain', 'vibechain.ink');
+        setHidden(formElement, 'lead_source', 'form');
+        setHidden(formElement, 'lead_type', LEAD_TYPE);
+        setHidden(formElement, 'source_campaign', SOURCE_CAMPAIGN);
+      }
+    });
+  })();
 </script>
 <div id="vibechain-form-root"></div>

@@ -1,0 +1,13 @@
+﻿{
+  "email": "owner@localshop.com",
+  "firstname": "Rene",
+  "lastname": "West",
+  "website_domain": "fullstacks.us",
+  "lead_source": "form",
+  "lead_type": "client_project",
+  "company": "Local Shop",
+  "industry": "Retail",
+  "budget": 12000,
+  "timeline": "6 weeks",
+  "source_campaign": "agency_intake"
+}

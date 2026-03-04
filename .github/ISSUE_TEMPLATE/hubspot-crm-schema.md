@@ -6,6 +6,12 @@ about: Standardize CRM fields and mapping across all lead sources
 ## Objective
 Define standardized CRM fields for all incoming leads across projects.
 
+## Tracking metadata
+- Milestone: `M02` or `M03`
+- Label: exactly one `milestone:mXX`
+- Label: exactly one `type:*`
+- Label: exactly one `priority:*`
+
 ## Deliverables
 - Property map for contacts/deals
 - Enum value definitions

@@ -41,7 +41,7 @@
     },
     {
       "parameters": {
-        "responseBody": "={{ { route: 'create_deal', payload: $json } }}",
+        "responseBody": "={{ { route: 'create_deal', reason: 'high_intent_or_budget', payload: $json } }}",
         "responseCode": 200
       },
       "id": "Deal",
@@ -52,7 +52,7 @@
     },
     {
       "parameters": {
-        "responseBody": "={{ { route: 'contact_only', payload: $json } }}",
+        "responseBody": "={{ { route: 'contact_only', reason: 'below_threshold', payload: $json } }}",
         "responseCode": 200
       },
       "id": "Contact",
