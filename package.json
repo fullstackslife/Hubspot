@@ -1,0 +1,14 @@
+﻿{
+  "name": "hubspot-lead-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HubSpot Starter lead engine for multi-vertical intake and semi-automated CRM workflows.",
+  "workspaces": [
+    "integration"
+  ],
+  "scripts": {
+    "test": "npm --workspace integration test",
+    "build": "npm --workspace integration run build",
+    "start": "npm --workspace integration start"
+  }
+}
