@@ -19,6 +19,19 @@ for (const warning of envValidation.warnings) {
 const port = Number(process.env.PORT || 8787);
 
 const server = createServer(async (req, res) => {
+  if (req.method === 'GET' && req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        ok: true,
+        service: 'hubspot-lead-engine',
+        status: 'running',
+        endpoints: ['GET /health', 'POST /ingest/lead']
+      })
+    );
+    return;
+  }
+
   if (req.method === 'GET' && req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok' }));
