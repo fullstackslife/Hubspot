@@ -1,0 +1,76 @@
+﻿{
+  "name": "deal_router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hubspot-deal-router",
+        "responseMode": "responseNode"
+      },
+      "id": "Webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [220, 260]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.intent_score}}",
+              "operation": "equal",
+              "value2": "high"
+            }
+          ],
+          "number": [
+            {
+              "value1": "={{Number($json.budget || 0)}}",
+              "operation": "largerEqual",
+              "value2": 5000
+            }
+          ]
+        },
+        "combineOperation": "any"
+      },
+      "id": "If",
+      "name": "Should Create Deal",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [500, 260]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{ { route: 'create_deal', payload: $json } }}",
+        "responseCode": 200
+      },
+      "id": "Deal",
+      "name": "Route: Create Deal",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [760, 170]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{ { route: 'contact_only', payload: $json } }}",
+        "responseCode": 200
+      },
+      "id": "Contact",
+      "name": "Route: Contact Only",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [760, 350]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Should Create Deal", "type": "main", "index": 0 }]]
+    },
+    "Should Create Deal": {
+      "main": [
+        [{ "node": "Route: Create Deal", "type": "main", "index": 0 }],
+        [{ "node": "Route: Contact Only", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}

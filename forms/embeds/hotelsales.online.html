@@ -1,0 +1,15 @@
+﻿<!-- Replace FORM_ID and PORTAL_ID before deploying -->
+<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+<script>
+  hbspt.forms.create({
+    region: "na1",
+    portalId: "PORTAL_ID",
+    formId: "FORM_ID",
+    target: "#hotelsales-form-root",
+    onFormReady: function () {
+      const domainField = document.querySelector('input[name="website_domain"]');
+      if (domainField) domainField.value = "hotelsales.online";
+    }
+  });
+</script>
+<div id="hotelsales-form-root"></div>

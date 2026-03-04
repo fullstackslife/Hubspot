@@ -1,0 +1,80 @@
+﻿{
+  "name": "error_handling",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hubspot-error-handler",
+        "responseMode": "responseNode"
+      },
+      "id": "Webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [220, 260]
+    },
+    {
+      "parameters": {
+        "functionCode": "const status = Number($json.status || 0);\nconst retryable = [429, 500, 502, 503, 504].includes(status);\nreturn [{ json: { ...$json, retryable } }];"
+      },
+      "id": "Classify",
+      "name": "Classify Error",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [470, 260]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.retryable}}",
+              "operation": "true"
+            }
+          ]
+        }
+      },
+      "id": "If",
+      "name": "Retryable?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 260]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{ { action: 'retry', payload: $json } }}",
+        "responseCode": 202
+      },
+      "id": "Retry",
+      "name": "Queue Retry",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [930, 170]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{ { action: 'dead_letter', payload: $json } }}",
+        "responseCode": 200
+      },
+      "id": "DLQ",
+      "name": "Dead Letter",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [930, 350]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Classify Error", "type": "main", "index": 0 }]]
+    },
+    "Classify Error": {
+      "main": [[{ "node": "Retryable?", "type": "main", "index": 0 }]]
+    },
+    "Retryable?": {
+      "main": [
+        [{ "node": "Queue Retry", "type": "main", "index": 0 }],
+        [{ "node": "Dead Letter", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}

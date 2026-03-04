@@ -1,0 +1,6 @@
+﻿node_modules/
+integration/node_modules/
+.env
+integration/.env
+.DS_Store
+Thumbs.db

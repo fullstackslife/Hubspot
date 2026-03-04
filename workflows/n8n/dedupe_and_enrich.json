@@ -1,0 +1,49 @@
+﻿{
+  "name": "dedupe_and_enrich",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "id": "Trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [220, 260]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Replace with real source pull (sheet/db/queue).\nreturn [];"
+      },
+      "id": "Load",
+      "name": "Load Raw Leads",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [460, 260]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Placeholder enrichment. Add Clearbit or internal enrichment API here.\nreturn items.map(item => {\n  const lead = item.json;\n  const budget = Number(lead.budget || 0);\n  lead.intent_score = lead.intent_score || (budget >= 10000 ? 'high' : budget >= 1000 ? 'medium' : 'low');\n  return { json: lead };\n});"
+      },
+      "id": "Enrich",
+      "name": "Enrich + Score",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [700, 260]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{ "node": "Load Raw Leads", "type": "main", "index": 0 }]]
+    },
+    "Load Raw Leads": {
+      "main": [[{ "node": "Enrich + Score", "type": "main", "index": 0 }]]
+    }
+  }
+}

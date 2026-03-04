@@ -1,0 +1,86 @@
+﻿{
+  "name": "form_or_scraper_ingest",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hubspot-lead-intake",
+        "responseMode": "responseNode"
+      },
+      "id": "Webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [260, 260]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = $json.body || $json;\nconst leadTypeToPipeline = {\n  hotel_group_booking: 'Hotel Leads',\n  hotel_corporate_rate: 'Hotel Leads',\n  creator_collab: 'Creator Partnerships',\n  client_project: 'AI Clients',\n  warbot_access: 'Warbot Users'\n};\n\nbody.email = (body.email || '').toLowerCase().trim();\nbody.pipeline_name = body.pipeline_name || leadTypeToPipeline[body.lead_type];\nbody.intent_score = body.intent_score || ((Number(body.budget || 0) >= 10000 || body.company) ? 'high' : (Number(body.budget || 0) >= 1000 ? 'medium' : 'low'));\nreturn [{ json: body }];"
+      },
+      "id": "Normalize",
+      "name": "Normalize Lead",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [520, 260]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.INTEGRATION_BASE_URL}}/ingest/lead",
+        "sendBody": true,
+        "bodyParametersJson": "={{$json}}",
+        "options": {}
+      },
+      "id": "Integration",
+      "name": "Call Integration API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [780, 260]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{$json}}",
+        "responseCode": 200
+      },
+      "id": "Respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1040, 260]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Lead": {
+      "main": [
+        [
+          {
+            "node": "Call Integration API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Integration API": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -16,6 +16,8 @@ export const LEAD_TYPES = [
   'client_project'
 ];
 
+export const HOTEL_LEAD_TYPES = ['hotel_group_booking', 'hotel_corporate_rate'];
+
 export const INTENT_LEVELS = ['low', 'medium', 'high'];
 
 export const PIPELINE_NAMES = {
@@ -41,3 +43,5 @@ export const REQUIRED_LEAD_FIELDS = [
   'lead_source',
   'lead_type'
 ];
+
+export const RETRYABLE_STATUS_CODES = [429, 500, 502, 503, 504];
