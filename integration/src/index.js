@@ -1,8 +1,17 @@
 ﻿import dotenv from 'dotenv';
 import { createServer } from 'node:http';
+import { validateRuntimeEnv } from './config/env.js';
 import { processLeadPayload } from './workflows/processLead.js';
 
 dotenv.config();
+
+const envValidation = validateRuntimeEnv();
+if (!envValidation.ok) {
+  for (const error of envValidation.errors) {
+    console.error(`[env] ${error}`);
+  }
+  process.exit(1);
+}
 
 const port = Number(process.env.PORT || 8787);
 
@@ -22,11 +31,13 @@ const server = createServer(async (req, res) => {
       return;
     } catch (error) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        ok: false,
-        status: 500,
-        errors: [error instanceof Error ? error.message : 'Unknown server error']
-      }));
+      res.end(
+        JSON.stringify({
+          ok: false,
+          status: 500,
+          errors: [error instanceof Error ? error.message : 'Unknown server error']
+        })
+      );
       return;
     }
   }
